@@ -1,0 +1,53 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <form method="post">
+      <input id="title" name="title" type="text" />
+      <input id="description" name="description" type="text" />
+    </form>
+    <button id="send">send</button>
+    <ul id="text"></ul>
+    <script>
+        const url = new URL("http://localhost:3001/note")
+
+        function addNote(note) {
+            var ul = document.getElementById("text");
+            var li = document.createElement("li");
+            li.appendChild(document.createTextNode(note.title + ": " + note.description));
+            ul.appendChild(li);
+        }
+
+        (function() { // equivalent ondocumentready
+            fetch(url, { method: "GET"}).then(function (response) {
+                response.json().then((notes) =>  {
+                    for(const note of notes) {
+                        addNote(note)
+                    }
+                })
+            })
+        })() 
+
+        document.getElementById("send").addEventListener("click", () => {
+            const note = {
+                title: document.getElementById("title").value,
+                description: document.getElementById("description").value
+            }
+            let request = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(note),
+            };
+            
+            fetch(url, request).then(function (response) {
+                addNote(note)
+            })
+        })
+    </script>
+  </body>
+</html>
